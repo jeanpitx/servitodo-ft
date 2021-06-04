@@ -12,13 +12,28 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
   var email;
   var password;
-  var fname;
-  var lname;
-  var phone;
+  var password_confirmation;
+
+  _showMsg(msg) {
+    final snackBar = SnackBar(
+      content: Text(msg),
+      action: SnackBarAction(
+        label: 'Close',
+        onPressed: () {
+          // Some code to undo the change!
+        },
+      ),
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
+    //_scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -73,75 +88,6 @@ class _RegisterState extends State<Register> {
                                 style: TextStyle(color: Color(0xFF000000)),
                                 cursorColor: Color(0xFF9b9b9b),
                                 keyboardType: TextInputType.text,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.insert_emoticon,
-                                    color: Colors.grey,
-                                  ),
-                                  hintText: "First Name",
-                                  hintStyle: TextStyle(
-                                      color: Color(0xFF9b9b9b),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                                validator: (firstname) {
-                                  if (firstname!.isEmpty) {
-                                    return 'Please enter your first name';
-                                  }
-                                  fname = firstname;
-                                  return null;
-                                },
-                              ),
-                              TextFormField(
-                                style: TextStyle(color: Color(0xFF000000)),
-                                cursorColor: Color(0xFF9b9b9b),
-                                keyboardType: TextInputType.text,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.insert_emoticon,
-                                    color: Colors.grey,
-                                  ),
-                                  hintText: "Last Name",
-                                  hintStyle: TextStyle(
-                                      color: Color(0xFF9b9b9b),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                                validator: (lastname) {
-                                  if (lastname!.isEmpty) {
-                                    return 'Please enter your last name';
-                                  }
-                                  lname = lastname;
-                                  return null;
-                                },
-                              ),
-                              TextFormField(
-                                style: TextStyle(color: Color(0xFF000000)),
-                                cursorColor: Color(0xFF9b9b9b),
-                                keyboardType: TextInputType.text,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.phone,
-                                    color: Colors.grey,
-                                  ),
-                                  hintText: "Phone",
-                                  hintStyle: TextStyle(
-                                      color: Color(0xFF9b9b9b),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                                validator: (phonenumber) {
-                                  if (phonenumber!.isEmpty) {
-                                    return 'Please enter phone number';
-                                  }
-                                  phone = phonenumber;
-                                  return null;
-                                },
-                              ),
-                              TextFormField(
-                                style: TextStyle(color: Color(0xFF000000)),
-                                cursorColor: Color(0xFF9b9b9b),
-                                keyboardType: TextInputType.text,
                                 obscureText: true,
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(
@@ -159,6 +105,33 @@ class _RegisterState extends State<Register> {
                                     return 'Please enter some text';
                                   }
                                   password = passwordValue;
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                style: TextStyle(color: Color(0xFF000000)),
+                                cursorColor: Color(0xFF9b9b9b),
+                                keyboardType: TextInputType.text,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.vpn_key,
+                                    color: Colors.grey,
+                                  ),
+                                  hintText: "Password Confirmation",
+                                  hintStyle: TextStyle(
+                                      color: Color(0xFF9b9b9b),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal),
+                                ),
+                                validator: (passwordConfirmationValue) {
+                                  if (passwordConfirmationValue!.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  if (passwordConfirmationValue!=password) {
+                                    return 'The password confirmation does not match';
+                                  }
+                                  password_confirmation = passwordConfirmationValue;
                                   return null;
                                 },
                               ),
@@ -226,21 +199,20 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
-  void _register()async{
+  void _register() async{
     setState(() {
       _isLoading = true;
     });
     var data = {
       'email' : email,
       'password': password,
-      'phone': phone,
-      'fname': fname,
-      'lname': lname
+      'password_confirmation': password_confirmation,
     };
 
     var res = await Network().authData(data, '/register');
     var body = json.decode(res.body);
-    if(body['success']){
+    
+    if(body.containsKey('response')){print("positivo");
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setString('token', json.encode(body['token']));
       localStorage.setString('user', json.encode(body['user']));
@@ -250,6 +222,10 @@ class _RegisterState extends State<Register> {
             builder: (context) => Home()
         ),
       );
+    }else{
+      print("else");
+      print(body);
+      //_showMsg(body['message']);
     }
 
     setState(() {
