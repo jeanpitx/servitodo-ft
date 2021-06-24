@@ -16,20 +16,19 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   var email;
   var password;
-  //final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  _showMsg(msg) {
+  _showMsg(msg,context) {
     final snackBar = SnackBar(
       content: Text(msg),
-      action: SnackBarAction(
+      duration: const Duration(seconds: 5),
+      action: SnackBarAction(//boton para cerrar
         label: 'Close',
         onPressed: () {
           // Some code to undo the change!
         },
       ),
     );
-    Scaffold.of(context).showSnackBar(snackBar);
-    //_scaffoldKey.currentState.showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
   
 
@@ -81,6 +80,10 @@ class _LoginState extends State<Login> {
                                     if (emailValue!.isEmpty) {
                                       return 'Please enter email';
                                     }
+                                    //validacion de formato de correo
+                                    if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(emailValue)){
+                                      return 'The Email format is not valid';
+                                    }
                                     email = emailValue;
                                     return null;
                                   },
@@ -96,6 +99,7 @@ class _LoginState extends State<Login> {
                                       color: Colors.grey,
                                     ),
                                     hintText: "Password",
+                                    labelText: 'Password',
                                     hintStyle: TextStyle(
                                         color: Color(0xFF9b9b9b),
                                         fontSize: 15,
@@ -184,12 +188,15 @@ class _LoginState extends State<Login> {
     };
 
     var res = await Network().authData(data, '/login');
-    var body = json.decode(res.body);
 
-    if(body['success']){
+    var body = json.decode(res.body);
+    print(body);
+    if(body['response']!="failed"){
+      print("Iniciando sesión");
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setString('token', json.encode(body['token']));
       localStorage.setString('user', json.encode(body['user']));
+      _showMsg(body['message'],context);
       Navigator.push(
           context,
           new MaterialPageRoute(
@@ -197,7 +204,16 @@ class _LoginState extends State<Login> {
           ),
       );
     }else{
-      _showMsg(body['message']);
+      //_showMsg(body['message'],context); // antes solo estaba asi
+      var msg_error=body["message"];
+      if(body.containsKey('errors')){
+        var errors = body['errors'] as Map;
+        errors.forEach((k,v) {//https://gist.github.com/aruld/1299216 or usrMap.forEach((k,v) => print('${k}: ${v}'));
+          msg_error+="\n * $k: $v";
+        }); 
+      }
+      _showMsg(msg_error,context);
+      print(msg_error);
     }
 
     setState(() {

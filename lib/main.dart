@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Test App',
+      title: 'Servitodo App',
       debugShowCheckedModeBanner: false,
       home: CheckAuth(),
     );

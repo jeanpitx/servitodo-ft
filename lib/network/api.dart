@@ -13,7 +13,7 @@ class Network{
 
   _getToken() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    token = jsonDecode(localStorage.getString('token'))['token'];
+    token = jsonDecode(localStorage.getString('token'));
   }
   
   authData(data, apiUrl) async {
@@ -28,6 +28,7 @@ class Network{
   getData(apiUrl) async {
     var fullUrl = _url + apiUrl;
     await _getToken();
+    print('token: $token');
     return await http.get(
         fullUrl,
         headers: _setHeaders()

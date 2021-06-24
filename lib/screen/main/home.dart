@@ -12,7 +12,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home>{
 
-  late String name;
+  String name = "usuario";
 
   @override
   void initState(){
@@ -24,9 +24,14 @@ class _HomeState extends State<Home>{
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var user = jsonDecode(localStorage.getString('user'));
 
+    //asi podemos obtener otros datos de los usuarios
+    /*var res = await Network().getData('/profile');
+    body = json.decode(res.body);
+    localStorage.setString('user', json.encode(body['name']));*/
+
     if(user != null) {
       setState(() {
-        name = user['fname'];
+        name = user;
       });
     }
   }
@@ -65,9 +70,11 @@ class _HomeState extends State<Home>{
   }
 
   void logout() async{
+    print("logout");
     var res = await Network().getData('/logout');
     var body = json.decode(res.body);
-    if(body['success']){
+    print(body);
+    if(body['response']=="success" || body['message']=="Unauthenticated."){print("ingresa");
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.remove('user');
       localStorage.remove('token');
