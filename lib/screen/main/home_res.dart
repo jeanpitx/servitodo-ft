@@ -107,7 +107,7 @@ class _HomeState extends State<Home>{
         iconTheme: IconThemeData(color: Colors.black87),
         //automaticallyImplyLeading: false,/*ocultamos el boton de regresar*/
       ),
-      drawer: Drawer(/************Conenido de menú hamburguesa************/
+      drawer: Drawer(/*Menu del boton hamburguesa*/
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -133,19 +133,17 @@ class _HomeState extends State<Home>{
             ),
           ],
         ),
-      ),/************Fin Conenido de menú hamburguesa************/
-      body: Stack(children: [
-        Padding(/************Conenido de la página************/
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text('Hi, $user',
               style: TextStyle(
                 fontWeight: FontWeight.bold
                 ),
               ),
-              SizedBox(height: 10),
               Center(
                 child: RaisedButton(
                   elevation: 10,
@@ -159,81 +157,7 @@ class _HomeState extends State<Home>{
               ),
             ],
           ),
-        ),/************Fin Conenido de la página************/
-        DraggableScrollableSheet(/************Conenido de popup************/
-          initialChildSize:0.2,
-          minChildSize:0.2,
-          maxChildSize:0.5,
-          builder: (BuildContext context, ScrollController scrollController) {
-            return Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: new BorderRadius.only(
-                    topLeft: const Radius.circular(10.0),
-                    topRight: const Radius.circular(10.0)
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-              ),
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: 4,
-                itemBuilder: (BuildContext context, int index) {
-                  if (index==0){ /*Primer elemento*/
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(140.0, 10.0, 140.0, 10.0),
-                          child: Container(
-                            height: 8.0,
-                            width: 80.0,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.all(const Radius.circular(8.0))
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.fromLTRB(10.0,0.0,10.0,10.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              TextFormField(
-                                style: TextStyle(color: Color(0xFF000000)),
-                                cursorColor: Color(0xFF9b9b9b),
-                                keyboardType: TextInputType.text,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.accessible_forward,
-                                    color: Colors.grey,
-                                  ),
-                                  hintText: "¿Buscas algún servicio?",
-                                  hintStyle: TextStyle(
-                                      color: Color(0xFF9b9b9b),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                              ),
-                            ]
-                          )
-                        )
-                      ],
-                    );
-                  }else{
-                    return ListTile(title: Text('Item'));
-                  }
-                },
-              ),
-            );
-          },
-        ),/************Fin Conenido de popup************/
-      ])
+      ),
     );
   }
 

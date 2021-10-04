@@ -76,6 +76,7 @@ class _LoginState extends State<Login> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.normal),
                                   ),
+                                  initialValue: "yojean02@hotmail.com",
                                   validator: (emailValue) {
                                     if (emailValue!.isEmpty) {
                                       return 'Please enter email';
@@ -105,6 +106,7 @@ class _LoginState extends State<Login> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.normal),
                                   ),
+                                  initialValue: "zambrano1",
                                   validator: (passwordValue) {
                                     if (passwordValue!.isEmpty) {
                                       return 'Please enter some text';
@@ -187,31 +189,42 @@ class _LoginState extends State<Login> {
       'password' : password
     };
 
-    var res = await Network().authData(data, '/login');
+    var response = await Network().authData(data, '/login');
 
-    var body = json.decode(res.body);
-    print(body);
-    if(body['response']!="failed"){
-      print("Iniciando sesión");
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('token', json.encode(body['token']));
-      localStorage.setString('user', json.encode(body['user']));
-      _showMsg(body['message'],context);
-      Navigator.push(
-          context,
-          new MaterialPageRoute(
-              builder: (context) => Home()
-          ),
-      );
-    }else{
-      //_showMsg(body['message'],context); // antes solo estaba asi
-      var msg_error=body["message"];
-      if(body.containsKey('errors')){
-        var errors = body['errors'] as Map;
-        errors.forEach((k,v) {//https://gist.github.com/aruld/1299216 or usrMap.forEach((k,v) => print('${k}: ${v}'));
-          msg_error+="\n * $k: $v";
-        }); 
+    
+    if(response.statusCode == 200){
+      var body = json.decode(response.body);
+      if(body['response']!="failed"){
+        print("Iniciando sesión");
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
+        localStorage.setString('token', json.encode(body['token']));
+        localStorage.setString('user', json.encode(body['user']));
+        _showMsg(body['message'],context);
+        Navigator.push(
+            context,
+            new MaterialPageRoute(
+                builder: (context) => Home()
+            ),
+        );
+      }else{
+        //_showMsg(body['message'],context); // antes solo estaba asi
+        var msg_error=body["message"];
+        if(body.containsKey('errors')){
+          var errors = body['errors'] as Map;
+          errors.forEach((k,v) {//https://gist.github.com/aruld/1299216 or usrMap.forEach((k,v) => print('${k}: ${v}'));
+            msg_error+="\n * $k: $v";
+          }); 
+        }
+        _showMsg(msg_error,context);
+        print(msg_error);
       }
+    }else{
+      var msg_error= "Ha ocurrido un error:";
+      msg_error+="\n * codigo: ${response.statusCode}";
+      var body = json.decode(response.body) as Map;
+      body.forEach((k,v) {
+        msg_error+="\n * $k: $v";
+      }); 
       _showMsg(msg_error,context);
       print(msg_error);
     }
